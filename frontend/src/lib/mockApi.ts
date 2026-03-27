@@ -21,6 +21,9 @@ import {
   MOCK_ACTIVITY,
   MOCK_USERS_LIST,
   MOCK_NOTIFICATIONS,
+  MOCK_ROLES,
+  MOCK_SEARCH_TREES,
+  MOCK_SEARCH_PEOPLE,
 } from "./mockData";
 
 // ── State ──────────────────────────────────────────────────────────────
@@ -57,8 +60,8 @@ function setLoggedUser(user: any) {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────
-const delay = (ms = 250) =>
-  new Promise<void>((r) => setTimeout(r, ms + Math.random() * 150));
+const delay = (ms = 180) =>
+  new Promise<void>((r) => setTimeout(r, ms + Math.random() * 120));
 
 function makeResponse(
   data: any,
@@ -68,7 +71,7 @@ function makeResponse(
   return {
     data,
     status,
-    statusText: status === 200 ? "OK" : "Created",
+    statusText: status === 200 ? "OK" : status === 201 ? "Created" : "OK",
     headers: { "content-type": "application/json" },
     config,
     request: {},
@@ -110,7 +113,7 @@ export async function mockAdapter(
       (u) => u.email === email && u.password === password,
     );
 
-    // Fallback: accept any email/password and return a demo user
+    // Fallback: accept any email/password and return a demo member user
     if (!user) {
       user = {
         id: 99,
@@ -186,9 +189,9 @@ export async function mockAdapter(
     return makeResponse({ token: MOCK_TOKEN, refreshToken: MOCK_REFRESH_TOKEN, user }, config);
   }
 
-  // ── TREES ─────────────────────────────────────────────────────────
-  if (method === "get" && /\/trees\/(\d+)\/gedcom/.test(path)) {
-    const match = path.match(/\/trees\/(\d+)\/gedcom/);
+  // ── TREES — GEDCOM (must be before general tree routes) ───────────
+  if (method === "get" && /\/(admin\/trees|my\/trees|trees)\/(\d+)\/gedcom/.test(path)) {
+    const match = path.match(/\/(\d+)\/gedcom/);
     const id = parseInt(match![1], 10);
     const tree = MOCK_TREES.find((t) => t.id === id);
     if (!tree || !tree.gedcom) throw makeError("GEDCOM not found", 404);
@@ -202,9 +205,12 @@ export async function mockAdapter(
     };
   }
 
+  // ── TREES ─────────────────────────────────────────────────────────
   if (method === "get" && /\/my\/trees/.test(path)) {
     const user = getLoggedUser();
-    const myTrees = MOCK_TREES.filter((t) => user && (t.owner === user.email || t.id <= 2));
+    const myTrees = MOCK_TREES.filter(
+      (t) => !user || t.owner === user.email || t.id <= 3
+    );
     return makeResponse(myTrees, config);
   }
 
@@ -224,19 +230,30 @@ export async function mockAdapter(
     return makeResponse(MOCK_TREES, config);
   }
 
-  if (method === "post" && /\/trees$/.test(path)) {
+  if (method === "post" && /\/my\/trees$/.test(path)) {
     let body: any = {};
     try {
       body = typeof config.data === "string" ? JSON.parse(config.data) : config.data || {};
-    } catch {
-      /* */
-    }
+    } catch { /* */ }
     const newTree = { ...body, id: Date.now(), createdAt: new Date().toISOString(), isPublic: true, hasGedcom: false };
     return makeResponse(newTree, config, 201);
   }
 
-  if (method === "put" && /\/trees\/\d+$/.test(path)) {
+  if (method === "post" && /\/trees$/.test(path)) {
+    let body: any = {};
+    try {
+      body = typeof config.data === "string" ? JSON.parse(config.data) : config.data || {};
+    } catch { /* */ }
+    const newTree = { ...body, id: Date.now(), createdAt: new Date().toISOString(), isPublic: true, hasGedcom: false };
+    return makeResponse(newTree, config, 201);
+  }
+
+  if (method === "put" && /\/(my\/)?trees\/\d+/.test(path)) {
     return makeResponse({ message: "Tree updated." }, config);
+  }
+
+  if (method === "post" && /\/(my\/)?trees\/\d+\/save/.test(path)) {
+    return makeResponse({ message: "Tree saved." }, config);
   }
 
   if (method === "delete" && /\/trees\/\d+$/.test(path)) {
@@ -249,7 +266,7 @@ export async function mockAdapter(
   }
 
   if (method === "get" && /\/my\/gallery/.test(path)) {
-    return makeResponse({ gallery: MOCK_GALLERY.slice(0, 5) }, config);
+    return makeResponse({ gallery: MOCK_GALLERY.slice(0, 8) }, config);
   }
 
   if (method === "get" && /\/gallery/.test(path)) {
@@ -258,6 +275,10 @@ export async function mockAdapter(
 
   if (method === "post" && /\/gallery/.test(path)) {
     return makeResponse({ message: "Image uploaded.", id: Date.now() }, config, 201);
+  }
+
+  if (method === "put" && /\/gallery\/\d+/.test(path)) {
+    return makeResponse({ message: "Image updated." }, config);
   }
 
   if (method === "delete" && /\/gallery\/\d+/.test(path)) {
@@ -270,11 +291,10 @@ export async function mockAdapter(
   }
 
   if (method === "get" && /\/my\/books/.test(path)) {
-    return makeResponse(MOCK_BOOKS.slice(0, 4), config);
+    return makeResponse(MOCK_BOOKS.slice(0, 6), config);
   }
 
   if (method === "get" && /\/books\/(\d+)\/download/.test(path)) {
-    // Simulate a download response with a demo PDF message
     return makeResponse({ message: "Download started (mock mode — no actual file)." }, config);
   }
 
@@ -319,6 +339,16 @@ export async function mockAdapter(
     return makeResponse({ message: "User deleted." }, config);
   }
 
+  if (method === "post" && /\/admin\/users/.test(path)) {
+    let body: any = {};
+    try { body = typeof config.data === "string" ? JSON.parse(config.data) : config.data || {}; } catch { /* */ }
+    return makeResponse({ id: Date.now(), ...body, status: "active" }, config, 201);
+  }
+
+  if (method === "get" && /\/admin\/roles/.test(path)) {
+    return makeResponse(MOCK_ROLES, config);
+  }
+
   // ── ACTIVITY ──────────────────────────────────────────────────────
   if (method === "get" && /\/activity/.test(path)) {
     return makeResponse(MOCK_ACTIVITY, config);
@@ -331,6 +361,26 @@ export async function mockAdapter(
 
   if (method === "post" && /\/notifications\/\d+\/read/.test(path)) {
     return makeResponse({ message: "Notification marked as read." }, config);
+  }
+
+  if (method === "put" && /\/notifications\/read-all/.test(path)) {
+    return makeResponse({ message: "All notifications marked as read." }, config);
+  }
+
+  // ── SEARCH ────────────────────────────────────────────────────────
+  if (method === "get" && /\/search\/suggest/.test(path)) {
+    const q = String(new URL(`http://x${url}`).searchParams.get("q") || "").toLowerCase().trim();
+    const trees = q.length < 2 ? [] : MOCK_SEARCH_TREES.filter(
+      (t) => t.title.toLowerCase().includes(q)
+    ).slice(0, 4);
+    const people = q.length < 2 ? [] : MOCK_SEARCH_PEOPLE.filter(
+      (p) => p.name.toLowerCase().includes(q) || (p.tree_title || "").toLowerCase().includes(q)
+    ).slice(0, 5);
+    return makeResponse({ trees, people }, config);
+  }
+
+  if (method === "get" && /\/search/.test(path)) {
+    return makeResponse({ trees: MOCK_SEARCH_TREES, people: MOCK_SEARCH_PEOPLE, total: MOCK_SEARCH_TREES.length + MOCK_SEARCH_PEOPLE.length }, config);
   }
 
   // ── SOCIAL ────────────────────────────────────────────────────────
@@ -348,7 +398,13 @@ export async function mockAdapter(
 
   // ── SETTINGS / MISC ───────────────────────────────────────────────
   if (method === "get" && /\/settings/.test(path)) {
-    return makeResponse({ siteName: "Roots Egypt", maintenance: false }, config);
+    return makeResponse({
+      siteName: "Roots Egypt",
+      maintenance: false,
+      allowSignup: true,
+      maxTreesPerUser: 10,
+      maxGalleryPerUser: 50,
+    }, config);
   }
 
   if (method === "put" && /\/settings/.test(path)) {
