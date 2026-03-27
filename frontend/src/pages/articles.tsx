@@ -198,7 +198,9 @@ export default function ArticlesPage() {
             authorName: img.author || t("community", "Community"),
             createdAt: img.createdAt ? new Date(img.createdAt).getTime() : Date.now(),
             imageUrl: img.image_path
-              ? `${apiRoot.replace(/\/+$/, "")}/uploads/gallery/${String(img.image_path).replace(/^\/+/, "")}`
+              ? String(img.image_path).startsWith("http")
+                ? String(img.image_path)
+                : `${apiRoot.replace(/\/+$/, "")}/uploads/gallery/${String(img.image_path).replace(/^\/+/, "")}`
               : undefined,
             sourceLabel: img.archiveSource || "",
           })),

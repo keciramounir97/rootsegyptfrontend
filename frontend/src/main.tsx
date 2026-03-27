@@ -14,8 +14,16 @@ import { queryClient } from "./lib/queryClient";
 import { GlobalProvider } from "./context/GlobalContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import BackendPanel from "./components/BackendPanel";
 
-// Find root element
+import { seedMockStorage } from "./lib/seedMockStorage";
+import { isMockMode } from "./lib/mockApi";
+
+// Seed mock articles/comments into localStorage on first load
+if (isMockMode()) {
+  seedMockStorage();
+}
+
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
@@ -30,6 +38,7 @@ if (rootElement) {
                   <AuthProvider>
                     <App />
                     <Toaster position="top-center" />
+                    <BackendPanel />
                   </AuthProvider>
                 </FavoritesProvider>
               </NotificationProvider>

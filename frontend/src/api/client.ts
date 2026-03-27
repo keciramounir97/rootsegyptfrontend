@@ -1,34 +1,34 @@
 
 import axios, { InternalAxiosRequestConfig } from "axios";
+import { isMockMode, mockAdapter } from "../lib/mockApi";
 
 /**
  * ===============================
- * API ROOT RESOLUTION (PRO SAFE)
+ * API ROOT RESOLUTION
  * ===============================
- *
- * - In production (Vite build): use SAME DOMAIN
- * - In dev: use localhost backend
- *
- * DO NOT rely on cPanel env for Vite (build-time only)
  */
-const API_ROOT: string = (() => {
-  // 1. Development mode: intelligently determine backend URL
+const getApiRoot = (): string => {
+  // Custom URL set by the user via BackendPanel
+  const customUrl = localStorage.getItem("rootsegypt_api_url");
+  if (customUrl && customUrl.trim()) {
+    return customUrl.trim().replace(/\/+$/, "");
+  }
+
   if (import.meta.env.DEV) {
-    // If accessing via IP (e.g. 192.168.x.x), try to hit backend on same IP
     if (
       typeof window !== "undefined" &&
       window.location.hostname !== "localhost" &&
       window.location.hostname !== "127.0.0.1"
     ) {
-      return `http://${window.location.hostname}:5000`;
+      return `http://${window.location.hostname}:5001`;
     }
-    return "http://localhost:5000";
+    return "http://localhost:5001";
   }
 
-  // 2. Production: Use VITE_API_URL from .env or fallback
   return import.meta.env.VITE_API_URL || "https://server.rootsegypt.com";
-})();
+};
 
+const API_ROOT = getApiRoot();
 const NORMALIZED_API_ROOT = API_ROOT.replace(/\/+$/, "");
 
 /**
@@ -42,8 +42,13 @@ export const api = axios.create({
   headers: {
     Accept: "application/json",
   },
-  withCredentials: false, // JWT is via Authorization header (NOT cookies)
+  withCredentials: false,
 });
+
+// ── Install mock adapter when in mock mode ─────────────────────────
+if (isMockMode()) {
+  (api as any).defaults.adapter = mockAdapter;
+}
 
 const dispatchAuthEvent = (name: string, detail: any) => {
   if (typeof window === "undefined") return;
@@ -70,11 +75,13 @@ const getRequestPath = (value: any): string => {
 /**
  * ===============================
  * REQUEST INTERCEPTOR
- * - Attach JWT safely
  * ===============================
  */
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Skip auth checks in mock mode — the mock adapter handles everything
+    if (isMockMode()) return config;
+
     const token = localStorage.getItem("token");
 
     const url = String(config?.url || "");
@@ -98,7 +105,6 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Prevent caching
     config.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
     config.headers["Pragma"] = "no-cache";
     config.headers["Expires"] = "0";
@@ -113,15 +119,17 @@ api.interceptors.request.use(
 /**
  * ===============================
  * RESPONSE INTERCEPTOR
- * - Handle auth expiration cleanly
- * - Unwrap standard API envelope
  * ===============================
  */
 api.interceptors.response.use(
   (response) => {
     // Unwrap API Envelope { statusCode, data, meta } -> data
-    if (response.data && response.data.data && response.data.statusCode && Object.keys(response.data).length <= 5) {
-      // It's likely our envelope. Check typical keys.
+    if (
+      response.data &&
+      response.data.data &&
+      response.data.statusCode &&
+      Object.keys(response.data).length <= 5
+    ) {
       const backendEnvelope = response.data;
       response.data = backendEnvelope.data;
       (response as any).meta = backendEnvelope.meta;
@@ -129,25 +137,23 @@ api.interceptors.response.use(
     return response;
   },
   async (error: any) => {
+    // In mock mode, errors from the mock adapter are intentional
+    if (isMockMode()) return Promise.reject(error);
+
     const status = error?.response?.status;
     const code = error?.code;
-    const message = error?.message || '';
+    const message = error?.message || "";
 
-    // Connection refused - server not running
-    if (code === 'ECONNREFUSED' || code === 'ERR_CONNECTION_REFUSED' || message.includes('ERR_CONNECTION_REFUSED')) {
-      if (typeof window !== 'undefined') {
-        const errorMsg = 'Backend server is not running. Please start it with: cd backend && npm start';
-        dispatchAuthEvent('api:connection_error', { message: errorMsg, code });
-
-        error.isConnectionError = true;
-        error.userMessage = 'Cannot connect to server. Please make sure the backend is running on port 5000.';
-      }
-    }
-
-    // Network errors
-    if (code === 'ERR_NETWORK' || code === 'ETIMEDOUT' || code === 'ECONNABORTED') {
-      error.isNetworkError = true;
-      error.userMessage = 'Network error. Please check your connection and ensure the server is running.';
+    if (
+      code === "ECONNREFUSED" ||
+      code === "ERR_CONNECTION_REFUSED" ||
+      message.includes("ERR_CONNECTION_REFUSED") ||
+      code === "ERR_NETWORK"
+    ) {
+      error.isConnectionError = true;
+      error.userMessage =
+        "Cannot connect to server. Enable Mock Mode (bottom-right button) to use demo data, or start your backend.";
+      dispatchAuthEvent("api:connection_error", { message: error.userMessage, code });
     }
 
     if (!error.userMessage) {
@@ -175,14 +181,8 @@ api.interceptors.response.use(
           const { data } = await axios.post(
             `${NORMALIZED_API_ROOT}/api/auth/refresh`,
             { refreshToken },
-            { headers: { "Content-Type": "application/json" } }
+            { headers: { "Content-Type": "application/json" } },
           );
-          // Recursively unwrap here? No, axios call returns response.data
-          // Recent change means data might be enveloped.
-          // BUT this axios call bypasses our interceptor ?? No, it uses 'axios.post' not 'api.post' so it uses default axios?
-          // Wait, 'axios.post' creates a NEW instance/call. It does NOT use 'api' instance.
-          // So 'data' is the raw body. 
-          // If backend now returns envelope, 'data' = { statusCode, data: { token... } }
 
           let newToken = data?.token;
           let newRefreshToken = data?.refreshToken;
@@ -200,7 +200,7 @@ api.interceptors.response.use(
             error.config._retry = true;
             return api.request(error.config);
           }
-        } catch (e) {
+        } catch {
           // Refresh failed
         }
       }
