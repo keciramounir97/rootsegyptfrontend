@@ -22,10 +22,11 @@ A specialized genealogy and cultural heritage platform focused on the Nile Valle
 ## Key Features
 
 - Family Tree Builder (D3-based, GEDCOM 5.5.1/7.0 support)
-- Genealogy Library (manuscripts, Ottoman records, Coptic registers)
-- Oral History recording/playback
+- Genealogy Library (manuscripts, Ottoman records, Coptic registers, Greco-Roman papyri)
+- Oral History recording/playback (Audio Library)
 - Historical Timeline (Pharaonic to Contemporary)
 - Multi-language support: English, French, Arabic (RTL), Spanish
+- Fake (mock) mode for prototype demos
 
 ## Development
 
@@ -35,15 +36,56 @@ npm install
 npm run dev   # Runs on port 5000
 ```
 
+## Mock Prototype Mode
+
+The app ships with a full mock layer that intercepts all API calls and returns realistic Egyptian-heritage data from localStorage + in-memory fixtures.
+
+### How it works
+
+- **`src/lib/mockApi.ts`** — Axios adapter that intercepts every request and routes it to mock handlers. Enabled when `localStorage.getItem("rootsegypt_mock_mode") !== "false"` (default ON).
+- **`src/lib/mockData.ts`** — All fixture data: 7 GEDCOM family trees, 20+ books/documents, 28 gallery images, 8 articles, 15 audio tracks, 10 users, admin stats, notifications, activity feed.
+- **`src/lib/seedMockStorage.ts`** — Seeds localStorage with articles, comments, like/share counts, and 15 Egyptian audio tracks on first load (version key: `rootsegypt_mock_seed_v5`).
+- **`src/components/BackendPanel.tsx`** — Floating panel (bottom-right) to toggle mock mode, set real backend URL (default `http://localhost:5001`), and clear localStorage.
+
+### Demo credentials (click-to-fill on login page)
+
+| Role       | Email                     | Password      |
+|------------|---------------------------|---------------|
+| Admin      | admin@rootsegypt.com      | password123   |
+| Researcher | researcher@rootsegypt.com | research123   |
+| Member     | demo@rootsegypt.com       | demo123       |
+
+Any other email/password combination → auto-creates a Member account.
+
+### Mock Data Coverage
+
+| Content     | Count | Notes |
+|-------------|-------|-------|
+| Family Trees | 7    | 5 modern Egyptian families + Ottoman-Cairo (1720-1890) + Greco-Roman Alexandria (30 BCE – 350 CE) — all with full valid GEDCOM 5.5.1 |
+| Books        | 15+  | Covers genealogy guides, Ottoman archives, Coptic registers, Roman papyri |
+| Documents    | 8+   | Ottoman tax registers, census records, court sijill, papyrus contracts |
+| Gallery      | 28   | Ottoman firmans, Roman papyri, family portraits, Nubian village photos |
+| Articles     | 8    | Genealogy guides, Ottoman history, Nubian heritage, Roman papyri research |
+| Audio Tracks | 15   | Recitations, poetry, lectures, interviews, music — Egyptian heritage themes |
+| Users        | 10   | Including admin, researcher, and member roles |
+
 ## Configuration
 
-- `frontend/vite.config.js` - Vite config (port 5000, host 0.0.0.0, allowedHosts: true for Replit proxy)
-- `frontend/.env.example` - Environment variable template
-- `frontend/tailwind.config.js` - Tailwind configuration
-- `frontend/tsconfig.json` - TypeScript configuration
+- `frontend/vite.config.js` — Vite config (port 5000, host 0.0.0.0, allowedHosts: true for Replit proxy)
+- `frontend/.env.example` — Environment variable template
+- `frontend/tailwind.config.js` — Tailwind configuration
+- `frontend/tsconfig.json` — TypeScript configuration
 
 ## Deployment
 
 Configured as a static site deployment:
 - Build: `cd frontend && npm run build`
 - Public Dir: `frontend/dist`
+
+## Real Backend Integration
+
+When connecting a real backend:
+1. Open the BackendPanel (bottom-right floating button)
+2. Disable mock mode
+3. Set the API URL to your backend (e.g. `http://localhost:5001`)
+4. Save — all API calls will go to the real backend

@@ -402,6 +402,10 @@ export async function mockAdapter(
       siteName: "Roots Egypt",
       maintenance: false,
       allowSignup: true,
+      allowRegistration: true,
+      activityRetentionDays: 90,
+      notifyAdmins: true,
+      defaultLanguage: "en",
       maxTreesPerUser: 10,
       maxGalleryPerUser: 50,
     }, config);
@@ -409,6 +413,14 @@ export async function mockAdapter(
 
   if (method === "put" && /\/settings/.test(path)) {
     return makeResponse({ message: "Settings saved." }, config);
+  }
+
+  if (method === "put" && /\/profile/.test(path)) {
+    return makeResponse({ message: "Profile updated." }, config);
+  }
+
+  if (method === "post" && /\/auth\/change-password/.test(path)) {
+    return makeResponse({ message: "Password changed." }, config);
   }
 
   // ── CATCH-ALL ─────────────────────────────────────────────────────

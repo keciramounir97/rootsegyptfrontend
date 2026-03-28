@@ -14,7 +14,7 @@ export default function BackendPanel() {
   const [open, setOpen] = useState(false);
   const [mock, setMock] = useState(isMockMode());
   const [apiUrl, setApiUrl] = useState(
-    () => localStorage.getItem("rootsegypt_api_url") || "http://localhost:5000"
+    () => localStorage.getItem("rootsegypt_api_url") || "http://localhost:5001"
   );
   const [saved, setSaved] = useState(false);
 
@@ -127,7 +127,7 @@ export default function BackendPanel() {
                   <input
                     value={apiUrl}
                     onChange={(e) => setApiUrl(e.target.value)}
-                    placeholder="http://localhost:5000"
+                    placeholder="http://localhost:5001"
                     className={`flex-1 text-xs rounded-lg border px-3 py-2 ${inputBg} outline-none`}
                   />
                   <button

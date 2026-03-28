@@ -651,6 +651,244 @@ export const MOCK_TREES = [
     createdAt: "2025-04-01T11:00:00Z",
     gedcom: GEDCOM_KHALIL,
   },
+  {
+    id: 6,
+    title: "Bey Family — Ottoman Cairo Lineage (1720-1890)",
+    description: "An Ottoman-Egyptian family lineage documented through Istanbul Başbakanlık Archives and Cairo Sharia court sijill records spanning the Mamluk-to-Khedive transition.",
+    owner_name: "Kamel Ibrahim Al-Masry",
+    owner: "kameladmin",
+    isPublic: true,
+    hasGedcom: true,
+    gedcom_path: "/api/trees/6/gedcom",
+    gedcomPath: "/api/trees/6/gedcom",
+    data_format: "gedcom",
+    archiveSource: "Başbakanlık Osmanlı Arşivi / Cairo Sharia Court Records",
+    documentCode: "EGY-OTT-1720",
+    createdAt: "2025-04-10T08:30:00Z",
+    gedcom: `0 HEAD
+1 SOUR RootsEgypt
+2 VERS 1.0
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Mustafa Pasha /Al-Qahiri/
+1 SEX M
+1 BIRT
+2 DATE 1720
+2 PLAC Istanbul, Ottoman Empire
+1 DEAT
+2 DATE 1791
+2 PLAC Cairo, Egypt
+1 NOTE Governor of Cairo Province, appointed 1758. Records in Ottoman sijill archives.
+1 FAMS @F1@
+0 @I2@ INDI
+1 NAME Fatima /Hanım/
+1 SEX F
+1 BIRT
+2 DATE 1730
+2 PLAC Cairo, Egypt
+1 DEAT
+2 DATE 1798
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME Ibrahim Bey /Al-Qahiri/
+1 SEX M
+1 BIRT
+2 DATE 1755
+2 PLAC Cairo, Egypt
+1 DEAT
+2 DATE 1823
+2 PLAC Cairo, Egypt
+1 NOTE Merchant and Ottoman tax collector, documented in Cairo Sharia Court records 1780-1820.
+1 FAMC @F1@
+1 FAMS @F2@
+0 @I4@ INDI
+1 NAME Zainab /Osman/
+1 SEX F
+1 BIRT
+2 DATE 1762
+2 PLAC Cairo, Egypt
+1 FAMS @F2@
+0 @I5@ INDI
+1 NAME Ahmed Bey /Al-Qahiri/
+1 SEX M
+1 BIRT
+2 DATE 1785
+2 PLAC Cairo, Egypt
+1 DEAT
+2 DATE 1852
+2 PLAC Cairo, Egypt
+1 NOTE Served Muhammad Ali's administration; land deed in Dar Al-Wathaeq archive.
+1 FAMC @F2@
+1 FAMS @F3@
+0 @I6@ INDI
+1 NAME Khayria /Abdallah/
+1 SEX F
+1 BIRT
+2 DATE 1792
+2 PLAC Bulaq, Cairo
+1 FAMS @F3@
+0 @I7@ INDI
+1 NAME Omar Effendi /Al-Qahiri/
+1 SEX M
+1 BIRT
+2 DATE 1815
+2 PLAC Cairo, Egypt
+1 DEAT
+2 DATE 1882
+2 PLAC Cairo, Egypt
+1 FAMC @F3@
+0 @I8@ INDI
+1 NAME Mariam /Al-Qahiri/
+1 SEX F
+1 BIRT
+2 DATE 1818
+2 PLAC Cairo, Egypt
+1 FAMC @F3@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 1750
+2 PLAC Cairo, Egypt
+1 CHIL @I3@
+0 @F2@ FAM
+1 HUSB @I3@
+1 WIFE @I4@
+1 MARR
+2 DATE 1780
+2 PLAC Cairo, Egypt
+1 CHIL @I5@
+0 @F3@ FAM
+1 HUSB @I5@
+1 WIFE @I6@
+1 MARR
+2 DATE 1812
+2 PLAC Cairo, Egypt
+1 CHIL @I7@
+1 CHIL @I8@
+0 TRLR`,
+  },
+  {
+    id: 7,
+    title: "Aurelius Family — Greco-Roman Alexandria (30 BCE – 350 CE)",
+    description: "A Greco-Egyptian family from Roman Alexandria documented through papyrus contracts, Fayyum census records, and the Oxyrhynchus papyri collection. Spans Roman domination period.",
+    owner_name: "Dr. Amr Fouad Al-Said",
+    owner: "researcher",
+    isPublic: true,
+    hasGedcom: true,
+    gedcom_path: "/api/trees/7/gedcom",
+    gedcomPath: "/api/trees/7/gedcom",
+    data_format: "gedcom",
+    archiveSource: "Oxyrhynchus Papyri Project / British Museum Papyrus Collection",
+    documentCode: "EGY-ROM-0030BCE",
+    createdAt: "2025-04-15T14:00:00Z",
+    gedcom: `0 HEAD
+1 SOUR RootsEgypt
+2 VERS 1.0
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Gaius Julius /Aurelius/
+1 SEX M
+1 BIRT
+2 DATE ABT 30 BCE
+2 PLAC Alexandria, Roman Egypt
+1 DEAT
+2 DATE ABT 25 CE
+2 PLAC Alexandria, Roman Egypt
+1 NOTE Merchant of mixed Macedonian-Egyptian descent. Listed in Alexandrian census papyrus P.Oxy 984.
+1 FAMS @F1@
+0 @I2@ INDI
+1 NAME Thaisis /Harpokration/
+1 SEX F
+1 BIRT
+2 DATE ABT 25 BCE
+2 PLAC Memphis, Roman Egypt
+1 DEAT
+2 DATE ABT 30 CE
+1 NOTE Egyptian-born. Marriage contract (P.Oxy 265) dated 3 CE lists dowry and family witnesses.
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME Marcus Aurelius /Alexandros/
+1 SEX M
+1 BIRT
+2 DATE ABT 5 CE
+2 PLAC Alexandria, Roman Egypt
+1 DEAT
+2 DATE ABT 65 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 NOTE Enrolled as Roman citizen under Claudius. Papyrus P.Oxy 3912 records his land holdings.
+1 FAMC @F1@
+1 FAMS @F2@
+0 @I4@ INDI
+1 NAME Isidora /Diodorus/
+1 SEX F
+1 BIRT
+2 DATE ABT 10 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 FAMS @F2@
+0 @I5@ INDI
+1 NAME Aurelius /Theon/
+1 SEX M
+1 BIRT
+2 DATE ABT 40 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 DEAT
+2 DATE ABT 110 CE
+1 NOTE Documented in Fayyum census (P.Lond 1912) as gymnasiarch of Oxyrhynchus.
+1 FAMC @F2@
+1 FAMS @F3@
+0 @I6@ INDI
+1 NAME Thermouthas /Apollonios/
+1 SEX F
+1 BIRT
+2 DATE ABT 45 CE
+2 PLAC Arsinoe, Roman Egypt
+1 FAMS @F3@
+0 @I7@ INDI
+1 NAME Aurelius /Sarapion/
+1 SEX M
+1 BIRT
+2 DATE ABT 80 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 DEAT
+2 DATE ABT 155 CE
+1 NOTE Listed in Roman tax register (P.Oxy 1476) paying poll tax as a minor landowner.
+1 FAMC @F3@
+0 @I8@ INDI
+1 NAME Aurelia /Dionysias/
+1 SEX F
+1 BIRT
+2 DATE ABT 85 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 FAMC @F3@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE ABT 3 CE
+2 PLAC Alexandria, Roman Egypt
+1 CHIL @I3@
+0 @F2@ FAM
+1 HUSB @I3@
+1 WIFE @I4@
+1 MARR
+2 DATE ABT 32 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 CHIL @I5@
+0 @F3@ FAM
+1 HUSB @I5@
+1 WIFE @I6@
+1 MARR
+2 DATE ABT 68 CE
+2 PLAC Oxyrhynchus, Roman Egypt
+1 CHIL @I7@
+1 CHIL @I8@
+0 TRLR`,
+  },
 ];
 
 // ─────────────────────────────────────────────
@@ -853,6 +1091,90 @@ export const MOCK_BOOKS = [
     fileSize: 41000000,
     filePath: null,
   },
+  {
+    id: 207,
+    title: "Ottoman Sijill Records — Mamluk to Khedive Transition (1517–1882)",
+    author: "Dr. Nelly Hanna, AUC",
+    description: "Annotated transcriptions of Islamic court sijill (registry) records from Ottoman Cairo covering property, marriage, inheritance, and commerce. Essential for tracing urban Egyptian families of the Ottoman period.",
+    category: "Archives & Records",
+    isPublic: true,
+    rating: 5,
+    downloads: 1542,
+    coverUrl: "https://picsum.photos/seed/doc-ottoman-sijill/400/600",
+    createdAt: "2025-03-15T00:00:00Z",
+    fileSize: 38000000,
+    filePath: null,
+  },
+  {
+    id: 208,
+    title: "Başbakanlık Osmanlı Arşivi: Egyptian Provincial Files 1600–1800",
+    author: "Turkish Directorate of State Archives",
+    description: "Guide to accessing Ottoman imperial archives relevant to Egyptian genealogy research. Includes mühimme defterleri (council decrees), tapu tahrir (land surveys), and Egyptian provincial appointment records.",
+    category: "Archives & Records",
+    isPublic: true,
+    rating: 4,
+    downloads: 674,
+    coverUrl: "https://picsum.photos/seed/doc-baskanlık/400/600",
+    createdAt: "2025-03-25T00:00:00Z",
+    fileSize: 22000000,
+    filePath: null,
+  },
+  {
+    id: 301,
+    title: "Families of Roman Egypt: Oxyrhynchus Papyri Genealogical Index",
+    author: "Oxyrhynchus Papyri Project, Oxford",
+    description: "A searchable index of family names and relationships extracted from 4,500 papyrus documents found at Oxyrhynchus (modern Bahnasa). Covers the Roman and Byzantine periods, 30 BCE–641 CE.",
+    category: "Classical History",
+    isPublic: true,
+    rating: 5,
+    downloads: 2210,
+    coverUrl: "https://picsum.photos/seed/doc-oxyrhynchus/400/600",
+    createdAt: "2025-01-08T00:00:00Z",
+    fileSize: 18000000,
+    filePath: null,
+  },
+  {
+    id: 302,
+    title: "The Fayyum Mummy Portraits: Art and Identity in Roman Egypt",
+    author: "Prof. Susan Walker, Ashmolean Museum",
+    description: "Comprehensive catalog of Fayyum portrait paintings (1st–4th century CE), each depicting named Egyptian individuals with Greek or Roman names — a unique window into mixed Greco-Egyptian family identity.",
+    category: "Classical History",
+    isPublic: true,
+    rating: 4,
+    downloads: 1890,
+    coverUrl: "https://picsum.photos/seed/doc-fayyum-portraits/400/600",
+    createdAt: "2025-01-20T00:00:00Z",
+    fileSize: 67000000,
+    filePath: null,
+  },
+  {
+    id: 303,
+    title: "Demotic & Greek Papyrus Contracts: Marriage and Inheritance in Ptolemaic Egypt",
+    author: "Dr. Willy Clarysse, KU Leuven",
+    description: "A scholarly edition of 200 bilingual papyrus marriage contracts (332 BCE – 30 BCE) from the Ptolemaic period, listing spouses, family witnesses, dowries, and divorce clauses in both Greek and Demotic Egyptian.",
+    category: "Classical History",
+    isPublic: false,
+    rating: 5,
+    downloads: 438,
+    coverUrl: "https://picsum.photos/seed/doc-demotic/400/600",
+    createdAt: "2025-02-10T00:00:00Z",
+    fileSize: 29000000,
+    filePath: null,
+  },
+  {
+    id: 304,
+    title: "Roman Census Returns from Egypt: A Complete Translation (P.Lond Series)",
+    author: "British Museum Press",
+    description: "English translations of all known Roman household census returns (kata oikian apographai) from Egypt (19 CE – 265 CE). Each return lists household head, spouse, children, and ages — the most complete Roman-era family records surviving anywhere.",
+    category: "Classical History",
+    isPublic: true,
+    rating: 5,
+    downloads: 3104,
+    coverUrl: "https://picsum.photos/seed/doc-roman-census/400/600",
+    createdAt: "2025-02-28T00:00:00Z",
+    fileSize: 14000000,
+    filePath: null,
+  },
 ];
 
 // ─────────────────────────────────────────────
@@ -879,6 +1201,14 @@ export const MOCK_GALLERY = [
   { id: 18, title: "Delta Village Families — Kafr El-Sheikh 1965", description: "Documentary photograph of three neighboring farming families from the Nile Delta before modernization of the agricultural system.", author: "Agricultural Survey Agency", archiveSource: "Ministry of Agriculture Archive", category: "Family Portraits", isPublic: true, createdAt: "2025-04-05T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-delta-village/800/600" },
   { id: 19, title: "Tax Register Page — Upper Egypt 1830", description: "Handwritten Ottoman fiscal register (daftar miri) for a village in Asyut province listing 67 household heads with their tax obligations.", author: "Ottoman Archives", archiveSource: "Turkish State Archives", category: "Documents", isPublic: true, createdAt: "2025-04-10T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-tax-register/800/600" },
   { id: 20, title: "Nile Flood Season — Cairo, Circa 1890", description: "Pre-High Dam photograph showing the annual Nile flood at its peak near Cairo. Several families are seen in boats navigating flooded streets.", author: "G. Lekegian & Co.", archiveSource: "Rare Books Library AUC", category: "Historical Sites", isPublic: true, createdAt: "2025-04-15T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-nile-flood/800/600" },
+  { id: 21, title: "Ottoman Firman — Land Grant to Cairo Merchant, 1812", description: "Rare Ottoman imperial decree (firman) issued by Mehmed IV granting trade rights to a Cairo merchant family. Stamped with the Sultan's tughra.", author: "Dar Al-Wathaeq", archiveSource: "Egyptian National Archives", category: "Documents", isPublic: true, createdAt: "2025-04-18T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-ottom-firman/800/600" },
+  { id: 22, title: "Istanbul Archives — Egyptian Provincial Register, 1740", description: "Page from the Ottoman Başbakanlık archives listing Egyptian provincial governors, their salaries, and family members eligible for state pensions.", author: "Başbakanlık Arşivi", archiveSource: "Turkish State Archives", category: "Documents", isPublic: true, createdAt: "2025-04-20T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-ottoman-reg/800/600" },
+  { id: 23, title: "Greco-Roman Papyrus — Fayyum Census, 104 CE", description: "Digitized papyrus fragment from the Roman census of Egypt (116/117 CE) listing a Greek-Egyptian household in the Arsinoite nome with 6 family members.", author: "Oxyrhynchus Papyri Project", archiveSource: "British Museum", category: "Manuscripts", isPublic: true, createdAt: "2025-04-22T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-roman-papyrus/800/600" },
+  { id: 24, title: "Alexandria Catacomb Inscription — 2nd Century CE", description: "Funerary inscription from the Kom Al-Shuqafa catacombs, Alexandria, naming a Greco-Egyptian family with bilingual Greek-Demotic text.", author: "Alexandria Museum", archiveSource: "Greco-Roman Museum Alexandria", category: "Historical Sites", isPublic: true, createdAt: "2025-04-24T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-alexandria-cata/800/600" },
+  { id: 25, title: "Mamluk-Era Waqf Deed — Cairo 1480", description: "Digitized religious endowment (waqf) document from Mamluk Cairo specifying land bequeathed to a mosque, with the founding family's lineage in 7 generations.", author: "Egyptian Museum", archiveSource: "Egyptian Museum", category: "Documents", isPublic: true, createdAt: "2025-04-26T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-mamluk-waqf/800/600" },
+  { id: 26, title: "Bedouin Family Camp — Eastern Desert 1910", description: "Early 20th-century photograph of a Bedouin family in their traditional black tent with tribal markings visible on the tent poles.", author: "Military Survey Dept.", archiveSource: "Survey of Egypt Archives", category: "Tribal Heritage", isPublic: true, createdAt: "2025-04-28T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-bedouin-tent/800/600" },
+  { id: 27, title: "Roman Forum Remnants — Alexandria, 1920s Survey", description: "Archaeological survey photograph of Roman forum excavation in Alexandria, showing marble columns with carved family dedication inscriptions.", author: "Egyptian Expedition Society", archiveSource: "Alexandria University Archive", category: "Historical Sites", isPublic: true, createdAt: "2025-05-01T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-roman-forum/800/600" },
+  { id: 28, title: "Khedive-Era Passport — Egyptian Family, 1898", description: "Rare example of a Khedivate of Egypt travel document issued to an Egyptian merchant family, listing all family members with physical descriptions.", author: "Dar Al-Wathaeq", archiveSource: "Cairo National Archives", category: "Documents", isPublic: true, createdAt: "2025-05-03T00:00:00Z", image_path: "https://picsum.photos/seed/gallery-khedive-passport/800/600" },
 ];
 
 // ─────────────────────────────────────────────
@@ -951,6 +1281,28 @@ export const MOCK_ARTICLES = [
     coverImage: "https://picsum.photos/seed/article-cover-6/800/400",
     categories: ["genealogy", "modern"],
   },
+  {
+    id: "art-mock-007",
+    title: "Researching Ottoman Egypt: A Guide to Istanbul's Archives",
+    body: `For any Egyptian family with roots in the Ottoman period (1517–1882), the most important archive in the world is not in Cairo — it is in Istanbul.\n\n**The Başbakanlık Osmanlı Arşivi**\nThe Ottoman imperial archives (BOA) in Istanbul hold millions of documents pertaining to every province of the empire, including Egypt (Eyalet-i Mısır). Key collections for genealogists include:\n- **Mühimme Defterleri**: Imperial council decrees naming Egyptian governors, merchants, and religious figures\n- **Tapu Tahrir Defterleri**: Land surveys listing village-by-village property owners\n- **Cevdet Tasnifi**: A massive miscellaneous collection with salary registers, appointment records, and family petitions\n\n**Cairo Sijill Records**\nThe Islamic courts of Cairo maintained detailed sijill (register) books for every transaction: marriage contracts, divorce records, inheritance settlements, and property disputes. These are held at Dar Al-Wathaeq in Cairo and go back to the 16th century.\n\n**What a Typical Ottoman Record Tells You**\nA marriage contract from 1780s Cairo would include: full name (with nasab chain), father's name, occupation, place of origin, bride's name and father, witnesses with their names and professions, dowry amount, and the signature of the Qadi (judge).\n\n**Getting Access Today**\nThe BOA can be searched remotely via their online catalog. For Cairo records, Dar Al-Wathaeq requires an in-person research permit. Many records are being digitized under the Egyptian National Archives project.`,
+    authorName: "Kamel Ibrahim Al-Masry",
+    authorId: 1,
+    roleLabel: "Admin",
+    createdAt: Date.now() - 10 * 24 * 3600 * 1000,
+    coverImage: "https://picsum.photos/seed/article-cover-7/800/400",
+    categories: ["ottoman", "archives"],
+  },
+  {
+    id: "art-mock-008",
+    title: "Papyrus and Identity: Finding Your Roman-Era Egyptian Ancestors",
+    body: `Egypt under Roman rule (30 BCE – 641 CE) produced one of the most extraordinary archives in human history: papyrus documents preserving the names, relationships, and daily lives of ordinary Egyptians in remarkable detail.\n\n**The Roman Census**\nEvery 14 years, Roman Egypt conducted a household census (kata oikian apographe). Each return listed every member of the household: name, age, relationship to the head of household, and legal status. Over 300 of these returns survive — more than from any other Roman province.\n\n**The Oxyrhynchus Papyri**\nDisovered in 1896-1897 at the ancient city of Oxyrhynchus (modern Bahnasa), over 500,000 papyrus fragments survive covering roughly 30 BCE to 700 CE. The Oxyrhynchus Papyri Project at Oxford has digitized thousands of documents, including:\n- Private letters between family members\n- Birth certificates and death notices\n- Marriage and divorce contracts\n- Land leases and wills with extensive family information\n\n**Mixed Identities**\nRoman Egypt had complex ethnic layers. A person might have a Greek first name, an Egyptian middle name, and a Roman clan name (gentilicium). The Fayyum portrait paintings show us what these individuals looked like — a priceless connection to ancient faces.\n\n**Searching the Records Today**\nThe Papyri.info portal provides free access to thousands of transcribed papyrus documents. Searching by name fragment can reveal family connections across generations. The British Museum, Bodleian Library, and Egyptian Museum all hold significant papyrus collections.`,
+    authorName: "Dr. Amr Fouad Al-Said",
+    authorId: 3,
+    roleLabel: "Researcher",
+    createdAt: Date.now() - 7 * 24 * 3600 * 1000,
+    coverImage: "https://picsum.photos/seed/article-cover-8/800/400",
+    categories: ["roman", "ancient"],
+  },
 ];
 
 export const MOCK_ARTICLE_COMMENTS = [
@@ -1011,6 +1363,8 @@ export const MOCK_ARTICLE_LIKE_COUNTS: Record<string, number> = {
   "art-mock-004": 24,
   "art-mock-005": 39,
   "art-mock-006": 15,
+  "art-mock-007": 52,
+  "art-mock-008": 28,
 };
 
 export const MOCK_ARTICLE_SHARE_COUNTS: Record<string, number> = {
@@ -1020,6 +1374,8 @@ export const MOCK_ARTICLE_SHARE_COUNTS: Record<string, number> = {
   "art-mock-004": 5,
   "art-mock-005": 11,
   "art-mock-006": 3,
+  "art-mock-007": 18,
+  "art-mock-008": 9,
 };
 
 // ─────────────────────────────────────────────
