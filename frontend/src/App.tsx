@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { Suspense, useEffect, memo } from "react";
+import { Suspense, memo } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "./context/TranslationContext";
 

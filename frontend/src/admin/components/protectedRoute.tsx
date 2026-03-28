@@ -1,7 +1,14 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { ReactNode } from "react";
 import { useAuth } from "./AuthContext";
 
-export default function ProtectedRoute({ children, roles = [], redirectTo = "/" }) {
+interface ProtectedRouteProps {
+  children: ReactNode;
+  roles?: number[];
+  redirectTo?: string;
+}
+
+export default function ProtectedRoute({ children, roles = [], redirectTo = "/" }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const location = useLocation();
 

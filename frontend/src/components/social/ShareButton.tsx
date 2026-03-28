@@ -17,7 +17,7 @@ const PLATFORMS = [
     id: "facebook",
     label: "Facebook",
     color: "bg-[#1877F2]",
-    getUrl: (url: string, title: string) =>
+    getUrl: (url: string, _title: string) =>
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
   },
   {

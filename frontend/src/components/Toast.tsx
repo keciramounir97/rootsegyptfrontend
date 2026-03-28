@@ -1,4 +1,9 @@
-export default function Toast({ message, tone = "success" }) {
+interface ToastProps {
+  message: string;
+  tone?: string;
+}
+
+export default function Toast({ message, tone = "success" }: ToastProps) {
   if (!message) return null;
 
   const toneClass =

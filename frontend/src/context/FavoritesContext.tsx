@@ -64,11 +64,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     setStore(loadStore());
   }, []);
 
-  const persist = useCallback((next: Store) => {
-    setStore(next);
-    saveStore(next);
-  }, []);
-
   const isFavorite = useCallback(
     (kind: FavoriteKind, id: string | number) => {
       const key = String(id);

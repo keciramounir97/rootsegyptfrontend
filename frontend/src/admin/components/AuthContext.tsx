@@ -26,7 +26,7 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   signup: (fullName: string, phone: string | undefined, email: string, password: string) => Promise<any>;
-  login: (email: string, password: string) => Promise<User>;
+  login: (email: string, password: string) => Promise<User | null>;
   requestReset: (email: string) => Promise<any>;
   verifyReset: (email: string, code: string, newPassword: string) => Promise<any>;
   logout: () => Promise<void>;

@@ -13,7 +13,7 @@ export default function LanguageMenu({
   className = "",
   buttonClassName = "",
 }: LanguageMenuProps) {
-  const { theme } = useThemeStore();
+  useThemeStore();
   const { locale, locales, setLocale, t } = useTranslation();
 
   const cycleLocale = () => {

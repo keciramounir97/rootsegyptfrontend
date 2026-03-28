@@ -105,7 +105,7 @@ export default function Settings() {
     });
   }, [user?.fullName, user?.phone]);
 
-  const updateSetting = (key, value) =>
+  const updateSetting = (key: string, value: unknown) =>
     setSettings((prev) => ({ ...prev, [key]: value }));
 
   const saveSettings = async () => {

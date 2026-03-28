@@ -55,14 +55,14 @@ export default function Breadcrumb() {
 
             {i === segments.length - 1 ? (
               <span className="font-semibold">
-                {String(s.label).replaceAll("-", " ")}
+                {String(s.label).split("-").join(" ")}
               </span>
             ) : (
               <Link
                 to={s.to}
                 className={`${accent} hover:underline capitalize`}
               >
-                {String(s.label).replaceAll("-", " ")}
+                {String(s.label).split("-").join(" ")}
               </Link>
             )}
           </li>

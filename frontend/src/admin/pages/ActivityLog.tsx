@@ -12,6 +12,14 @@ import { api } from "../../api/client";
 import { useTranslation } from "../../context/TranslationContext";
 import { useAuth } from "../components/AuthContext";
 
+interface ActivityRow {
+  id: string | number;
+  type: string;
+  description: string;
+  user: string;
+  date: string;
+}
+
 export default function ActivityLog() {
   const { theme } = useThemeStore();
   const { t } = useTranslation();
@@ -21,7 +29,7 @@ export default function ActivityLog() {
 
   const [q, setQ] = useState("");
   const [type, setType] = useState("all");
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<ActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -49,10 +57,11 @@ export default function ActivityLog() {
           });
           if (!active) return;
           setRows(Array.isArray(data) ? data : []);
-        } catch (err) {
+        } catch (err: unknown) {
           if (!active) return;
           setRows([]);
-          setError(err.response?.data?.message || t("activity_load_failed", "Failed to load activity"));
+          const apiErr = err as { response?: { data?: { message?: string } } };
+          setError(apiErr?.response?.data?.message || t("activity_load_failed", "Failed to load activity"));
         } finally {
           if (!active) return;
           setLoading(false);
@@ -67,21 +76,21 @@ export default function ActivityLog() {
   }, [q, type]);
 
   const iconFor = useMemo(
-    () => (t) => {
-      if (t === "security") return <ShieldAlert className="w-4 h-4" />;
-      if (t === "users") return <Users className="w-4 h-4" />;
-      if (t === "books") return <BookOpen className="w-4 h-4" />;
+    () => (rowType: string) => {
+      if (rowType === "security") return <ShieldAlert className="w-4 h-4" />;
+      if (rowType === "users") return <Users className="w-4 h-4" />;
+      if (rowType === "books") return <BookOpen className="w-4 h-4" />;
       return <Activity className="w-4 h-4" />;
     },
     []
   );
 
-  const chipClass = (t) => {
-    if (t === "security") {
+  const chipClass = (rowType: string) => {
+    if (rowType === "security") {
       return isDark ? "bg-[#556b2f]/20 text-[#f8f5ef]" : "bg-[#556b2f]/15 text-[#0d1b2a]";
     }
-    if (t === "users") return "bg-[#0c4a6e]/15 text-[#0c4a6e]";
-    if (t === "books") {
+    if (rowType === "users") return "bg-[#0c4a6e]/15 text-[#0c4a6e]";
+    if (rowType === "books") {
       return isDark ? "bg-teal/20 text-[#f8f5ef]" : "bg-teal/15 text-[#0d1b2a]";
     }
     return isDark

@@ -42,7 +42,26 @@ import { useAuth } from "../components/AuthContext";
 
 const MAX_GEDCOM_BYTES = 50 * 1024 * 1024;
 
-const normalizeOwner = (tree) => normalizeTree(tree);
+interface TreeItem {
+  id: string | number;
+  title?: string;
+  description?: string;
+  archiveSource?: string;
+  documentCode?: string;
+  isPublic?: boolean;
+  hasGedcom?: boolean;
+  data_format?: string;
+  owner?: unknown;
+  owner_name?: string;
+  is_public?: boolean;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
+interface PersonItem {
+  id?: string | number;
+  [key: string]: unknown;
+}
 
 const buildMockTrees = () =>
   Array.from({ length: 10 }).map((_, i) => ({
@@ -83,23 +102,23 @@ export default function Trees() {
 
   const [q, setQ] = useState("");
 
-  const [myTrees, setMyTrees] = useState([]);
+  const [myTrees, setMyTrees] = useState<TreeItem[]>([]);
 
-  const [publicTrees, setPublicTrees] = useState([]);
+  const [publicTrees, setPublicTrees] = useState<TreeItem[]>([]);
 
   const [loadingTrees, setLoadingTrees] = useState(true);
 
   const [treesError, setTreesError] = useState("");
 
-  const [selectedTree, setSelectedTree] = useState(null);
+  const [selectedTree, setSelectedTree] = useState<TreeItem | null>(null);
 
-  const [selectedScope, setSelectedScope] = useState(null); // "my" | "public" | null
+  const [selectedScope, setSelectedScope] = useState<string | null>(null); // "my" | "public" | null
 
   const [loadingGedcom, setLoadingGedcom] = useState(false);
 
   const [gedcomError, setGedcomError] = useState("");
 
-  const [people, setPeople] = useState([]);
+  const [people, setPeople] = useState<PersonItem[]>([]);
 
   const [saveFormat, setSaveFormat] = useState("gedcom"); // 'gedcom' | 'gedcomx_json' | 'gedcomx_xml' | 'gedcomx_gedx'
   const [treeForm, setTreeForm] = useState({
@@ -126,9 +145,9 @@ export default function Trees() {
 
   const [deletingTree, setDeletingTree] = useState(false);
 
-  const autoSaveTimerRef = useRef(null);
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const autoSavePeopleRef = useRef(null);
+  const autoSavePeopleRef = useRef<unknown>(null);
 
   const autoSaveInFlightRef = useRef(false);
 
@@ -146,22 +165,22 @@ export default function Trees() {
 
     const mockTrees = isMock ? buildMockTrees() : [];
 
-    const mergeById = (list) => {
+    const mergeById = (list: TreeItem[]) => {
       const map = new Map();
 
-      list.forEach((t) => {
-        if (!t) return;
+      list.forEach((item) => {
+        if (!item) return;
 
-        map.set(String(t.id), t);
+        map.set(String(item.id), item);
       });
 
-      return Array.from(map.values());
+      return Array.from(map.values()) as TreeItem[];
     };
 
     let loadError = "";
 
     try {
-      const shouldFallbackAdminRead = (err) =>
+      const shouldFallbackAdminRead = (err: { response?: { status?: number } }) =>
         shouldFallbackRoute(err) ||
         err?.response?.status === 401 ||
         err?.response?.status === 403 ||
@@ -328,7 +347,7 @@ export default function Trees() {
 
       const ownerValue =
         ownerRaw && typeof ownerRaw === "object"
-          ? ownerRaw.fullName || ownerRaw.email || ""
+          ? (ownerRaw as { fullName?: string; email?: string }).fullName || (ownerRaw as { fullName?: string; email?: string }).email || ""
           : ownerRaw || "";
 
       const owner = String(ownerValue).toLowerCase();
@@ -337,7 +356,7 @@ export default function Trees() {
     });
   }, [trees, q]);
 
-  const upsertTree = (list, patch) => {
+  const upsertTree = (list: TreeItem[], patch: TreeItem) => {
     const id = String(patch?.id);
 
     const existing = list.find((t) => String(t?.id) === id) || null;
@@ -356,8 +375,17 @@ export default function Trees() {
     archiveSource,
     documentCode,
     data_format,
+  }: {
+    id: string | number;
+    title?: string;
+    description?: string;
+    isPublic?: boolean;
+    hasGedcom?: boolean;
+    archiveSource?: string;
+    documentCode?: string;
+    data_format?: string;
   }) => {
-    const patch = {
+    const patch: TreeItem = {
       id,
       title,
       description: description ?? "",
@@ -390,7 +418,7 @@ export default function Trees() {
     });
   };
 
-  const openTree = async (tree) => {
+  const openTree = async (tree: TreeItem) => {
     setSelectedScope(tab);
 
     setSelectedTree(tree);
@@ -415,7 +443,7 @@ export default function Trees() {
       if (String(tree.id).startsWith("mock-")) {
         // GENERATE REALISTIC ARABIC FAMILY MEMBERS
 
-        const familyName = tree.title.split(" ").pop(); // e.g., "Al-Fulan"
+        const familyName = (tree.title || "").split(" ").pop(); // e.g., "Al-Fulan"
 
         const mockPeople = [
           // Grandfather (Gen 0)
@@ -545,7 +573,7 @@ export default function Trees() {
       const tryAdmin = () => api.get(`/admin/trees/${tree.id}/gedcom`, opts);
       const tryMy = () => api.get(`/my/trees/${tree.id}/gedcom`, opts);
       const tryPublic = () => api.get(`/trees/${tree.id}/gedcom`, opts);
-      const fallbackGedcom = (err) =>
+      const fallbackGedcom = (err: { response?: { status?: number } }) =>
         err?.response?.status === 404 ||
         err?.response?.status === 403 ||
         err?.response?.status === 401 ||
@@ -577,25 +605,27 @@ export default function Trees() {
     }
   };
 
-  const shouldFallbackTreeWrite = (err) =>
+  const shouldFallbackTreeWrite = (err: { response?: { status?: number } }) =>
     shouldFallbackRoute(err) || err?.response?.status === 500;
 
   const submitTree = async ({
     treeId,
-
     title,
-
     description,
-
     archiveSource,
-
     documentCode,
-
     isPublic,
-
-    people = [],
-
+    people = [] as PersonItem[],
     includeFile = true,
+  }: {
+    treeId?: string | number;
+    title?: string;
+    description?: string;
+    archiveSource?: string;
+    documentCode?: string;
+    isPublic?: boolean;
+    people?: PersonItem[];
+    includeFile?: boolean;
   }) => {
     const safeTitle = String(title || "").trim();
 
@@ -642,7 +672,7 @@ export default function Trees() {
         }
       } catch (err) {
         throw new Error(
-          err?.message ||
+          (err instanceof Error ? err.message : "") ||
             (saveFormat === "gedcom7"
               ? t("gedcom7_build_failed", "Failed to build GEDCOM 7.0")
               : saveFormat === "gedcom"
@@ -685,7 +715,7 @@ export default function Trees() {
     return data?.id;
   };
 
-  const downloadTreeFile = async (tree, scope) => {
+  const downloadTreeFile = async (tree: TreeItem, scope: string) => {
     if (!tree?.id) return;
     const endpoint =
       scope === "public"
@@ -801,7 +831,7 @@ export default function Trees() {
     }
   };
 
-  const scheduleAutoSave = (nextPeople) => {
+  const scheduleAutoSave = (nextPeople: PersonItem[]) => {
     if (!canUpdateSelected) return;
 
     peopleDirtyRef.current = true;
@@ -990,7 +1020,8 @@ export default function Trees() {
 
       setSaveSuccess(t("tree_deleted", "Tree deleted."));
     } catch (err) {
-      if (err?.response?.status === 404) {
+      const deleteErr = err as { response?: { status?: number } };
+      if (deleteErr?.response?.status === 404) {
         setMyTrees((prev) =>
           prev.filter((t) => String(t.id) !== String(deletedId))
         );
@@ -1333,7 +1364,7 @@ export default function Trees() {
                               {tree.title}
                             </h3>
                             <p className="text-sm opacity-70">
-                              {tree.owner || t("unknown", "Unknown")}
+                              {String(tree.owner || t("unknown", "Unknown"))}
                             </p>
                           </div>
                           <span

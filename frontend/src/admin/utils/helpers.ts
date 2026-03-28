@@ -1,6 +1,6 @@
-export const classNames = (...args) => args.filter(Boolean).join(" ");
+export const classNames = (...args: unknown[]) => args.filter(Boolean).join(" ");
 
-export const formatDate = (iso) => {
+export const formatDate = (iso: string | null | undefined) => {
   if (!iso) return "";
   try {
     const d = new Date(iso);

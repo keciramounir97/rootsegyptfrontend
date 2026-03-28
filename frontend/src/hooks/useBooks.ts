@@ -59,7 +59,7 @@ export const useAdminBooks = (options = {}) => {
 /**
  * Fetch single book by ID
  */
-export const useBook = (id, options = {}) => {
+export const useBook = (id: string | number | undefined, options = {}) => {
   return useQuery({
     queryKey: queryKeys.books.detail(id),
     queryFn: async () => {
@@ -120,14 +120,14 @@ export const useUpdateBook = (options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, formData }) => {
+    mutationFn: async ({ id, formData }: { id: string | number; formData: FormData }) => {
       const { data } = await api.put(`/my/books/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return data;
     },
     // Optimistic update
-    onMutate: async ({ id, formData }) => {
+    onMutate: async ({ id, formData }: { id: string | number; formData: FormData }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.books.detail(id) });
       const previousBook = queryClient.getQueryData(queryKeys.books.detail(id));
       

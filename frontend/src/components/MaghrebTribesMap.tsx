@@ -8,7 +8,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
-import L from "leaflet";
+import L, { type LatLngExpression } from "leaflet";
 
 // Fix for default marker icons in React-Leaflet
 // @ts-ignore
@@ -369,7 +369,7 @@ export default function MaghrebTribesMap() {
           return (
             <div key={zone.name}>
               <Polygon
-                positions={zone.coordinates}
+                positions={zone.coordinates as LatLngExpression[]}
                 pathOptions={{
                   color: zone.color,
                   fillColor: zone.color,
@@ -407,7 +407,7 @@ export default function MaghrebTribesMap() {
 
         {/* CITIES */}
         {cities.map((city) => (
-          <Marker key={city.name} position={city.coords}>
+          <Marker key={city.name} position={city.coords as LatLngExpression}>
             <Popup>
               <div className="text-sm p-1">
                 <h4 className="font-bold mb-1">{city.name}</h4>

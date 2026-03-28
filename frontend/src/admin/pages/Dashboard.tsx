@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-unsafe-finally */
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { fetchStats, fetchRecentActivity } from "../utils/api";
 import { formatDate } from "../utils/helpers";
 import { Users, BookOpen, Network, UserRound, Activity } from "lucide-react";
@@ -10,7 +10,14 @@ import { useAuth } from "../components/AuthContext";
 import { api } from "../../api/client";
 
 /* -------------------- STAT CARD -------------------- */
-function StatCard({ title, value, color, Icon, isDark }) {
+interface StatCardProps {
+  title: string;
+  value: number | string;
+  color: string;
+  Icon: React.ElementType;
+  isDark: boolean;
+}
+function StatCard({ title, value, color, Icon, isDark }: StatCardProps) {
   const cardBg = isDark ? "bg-[#0d1b2a]" : "bg-white";
   const border = isDark ? "border-white/10" : "border-[#e8dfca]";
   const hover = isDark ? "hover:bg-white/5 hover:shadow-lg" : "hover:bg-[#0c4a6e]/5 hover:shadow-lg";
@@ -65,7 +72,7 @@ export default function Dashboard() {
     publicBooks: 0,
     events: 0,
   });
-  const [activity, setActivity] = useState([]);
+  const [activity, setActivity] = useState<{ type?: string; description?: string; user?: string; date?: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 

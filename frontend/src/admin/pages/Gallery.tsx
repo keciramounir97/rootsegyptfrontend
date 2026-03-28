@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useThemeStore } from "../../store/theme";
 import { useTranslation } from "../../context/TranslationContext";
 import { api } from "../../api/client";
@@ -25,6 +25,23 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Toast from "../../components/Toast";
 
+interface GalleryItem {
+  id: string | number;
+  title?: string;
+  description?: string;
+  isPublic?: boolean;
+  archiveSource?: string;
+  documentCode?: string;
+  location?: string;
+  year?: string | number;
+  photographer?: string;
+  image_path?: string;
+  imagePath?: string;
+  createdAt?: string;
+  name?: string;
+  [key: string]: unknown;
+}
+
 export default function AdminGallery() {
   const { theme } = useThemeStore();
   const { t } = useTranslation();
@@ -34,10 +51,10 @@ export default function AdminGallery() {
   const maxImageBytes = 10 * 1024 * 1024;
   const allowedImageExts = new Set(["jpg", "jpeg", "png", "gif", "webp"]);
 
-  const [gallery, setGallery] = useState([]);
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | number | null>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -45,17 +62,17 @@ export default function AdminGallery() {
     archiveSource: "",
     documentCode: "",
   });
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [viewItem, setViewItem] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [viewItem, setViewItem] = useState<GalleryItem | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [toast, setToast] = useState({ message: "", tone: "success" });
 
-  const getExtension = (name) => {
+  const getExtension = (name: string) => {
     const parts = String(name || "").toLowerCase().split(".");
     return parts.length > 1 ? parts.pop() : "";
   };
 
-  const validateImageFile = (file, { required = false } = {}) => {
+  const validateImageFile = (file: File | null | undefined, { required = false } = {}) => {
     if (!file) {
       return required ? t("image_required", "Please select an image") : "";
     }
@@ -70,7 +87,7 @@ export default function AdminGallery() {
     return "";
   };
 
-  const notify = useCallback((message, tone = "success") => {
+  const notify = useCallback((message: string, tone = "success") => {
     setToast({ message, tone });
   }, []);
 
@@ -82,7 +99,7 @@ export default function AdminGallery() {
     return () => clearTimeout(timer);
   }, [toast.message]);
 
-  const resolveImageUrl = (value) => {
+  const resolveImageUrl = (value: unknown) => {
     const raw = String(value || "").trim();
     if (!raw) return "";
     if (raw.startsWith("http")) return raw;
@@ -96,7 +113,7 @@ export default function AdminGallery() {
   const loadGallery = useCallback(async ({ notify: notifyToast = false } = {}) => {
     try {
       setLoading(true);
-      const shouldFallbackAdminRead = (err) =>
+      const shouldFallbackAdminRead = (err: { response?: { status?: number } }) =>
         shouldFallbackRoute(err) ||
         err?.response?.status === 401 ||
         err?.response?.status === 403 ||
@@ -148,7 +165,7 @@ export default function AdminGallery() {
     setEditingId(null);
   };
 
-  const handleImageSelect = (e) => {
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -166,12 +183,12 @@ export default function AdminGallery() {
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = (item: GalleryItem) => {
     setEditingId(item.id);
     setForm({
       title: item.title || "",
       description: item.description || "",
-      isPublic: item.isPublic,
+      isPublic: !!item.isPublic,
       archiveSource: item.archiveSource || "",
       documentCode: item.documentCode || "",
     });
@@ -181,7 +198,7 @@ export default function AdminGallery() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.title.trim()) {
@@ -205,7 +222,7 @@ export default function AdminGallery() {
     if (form.documentCode.trim())
       formData.append("documentCode", form.documentCode.trim());
 
-    const shouldFallbackWrite = (err) =>
+    const shouldFallbackWrite = (err: { response?: { status?: number } }) =>
       shouldFallbackRoute(err) ||
       err?.response?.status === 401 ||
       err?.response?.status === 403 ||
@@ -255,7 +272,7 @@ export default function AdminGallery() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string | number) => {
     if (
       !window.confirm(
         t("confirm_delete", "Are you sure you want to delete this item?")
@@ -265,7 +282,7 @@ export default function AdminGallery() {
     }
 
     try {
-      const shouldFallbackWrite = (err) =>
+      const shouldFallbackWrite = (err: { response?: { status?: number } }) =>
         shouldFallbackRoute(err) ||
         err?.response?.status === 401 ||
         err?.response?.status === 403 ||
@@ -361,7 +378,7 @@ export default function AdminGallery() {
               </label>
               <div
                 className={`border-2 border-dashed ${border} rounded-lg p-6 text-center cursor-pointer transition hover:border-teal hover:bg-teal/5`}
-                onClick={() => document.getElementById("imageInput").click()}
+                onClick={() => (document.getElementById("imageInput") as HTMLInputElement | null)?.click()}
               >
                 {previewUrl ? (
                   <div className="space-y-3">
@@ -577,7 +594,7 @@ export default function AdminGallery() {
                     className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
                     onError={(e) => {
                       console.error("Image load error:", item.imagePath);
-                      e.target.src =
+                      (e.target as HTMLImageElement).src =
                         "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ddd' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23999' font-size='18'%3EImage not found%3C/text%3E%3C/svg%3E";
                     }}
                   />
@@ -654,7 +671,7 @@ export default function AdminGallery() {
 
                   <div className="flex items-center justify-between pt-2">
                     <span className={`${textColor} opacity-40 text-xs`}>
-                      {new Date(item.createdAt).toLocaleDateString()}
+                      {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
                     </span>
                     <div className="flex items-center gap-2">
                       <button

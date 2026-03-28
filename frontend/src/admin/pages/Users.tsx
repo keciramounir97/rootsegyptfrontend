@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Search,
   UserPlus,
@@ -21,6 +21,24 @@ import { useAuth } from "../components/AuthContext";
 import { useTranslation } from "../../context/TranslationContext";
 import Toast from "../../components/Toast";
 
+interface UserItem {
+  id: string | number;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  roleId?: number;
+  role?: number;
+  roleName?: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
+interface RoleItem {
+  id: string | number;
+  name?: string;
+  [key: string]: unknown;
+}
+
 export default function UsersPage() {
   const { theme } = useThemeStore();
   const { user: currentUser } = useAuth();
@@ -36,14 +54,14 @@ export default function UsersPage() {
   const inputText = isDark ? "text-[#f8f5ef]" : "text-[#0d1b2a]";
 
   const [q, setQ] = useState("");
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-  const [editTarget, setEditTarget] = useState(null);
-  const [roles, setRoles] = useState([]);
+  const [editTarget, setEditTarget] = useState<UserItem | null>(null);
+  const [roles, setRoles] = useState<RoleItem[]>([]);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -59,7 +77,7 @@ export default function UsersPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState({ message: "", tone: "success" });
 
-  const notify = useCallback((message, tone = "success") => {
+  const notify = useCallback((message: string, tone = "success") => {
     setToast({ message, tone });
   }, []);
 
@@ -119,13 +137,13 @@ export default function UsersPage() {
   const openAdd = async () => {
     setError("");
     setSaving(false);
-    setForm({ fullName: "", email: "", phone: "", roleId: roles[0]?.id || 2 });
+    setForm({ fullName: "", email: "", phone: "", roleId: Number(roles[0]?.id) || 2 });
     setShowAdd(true);
     try {
       const data = roles.length ? roles : await loadRoles();
       setRoles(data);
       if (!form.roleId && data.length) {
-        setForm((prev) => ({ ...prev, roleId: data[0].id }));
+        setForm((prev) => ({ ...prev, roleId: Number(data[0].id) }));
       }
     } catch (err) {
       setShowAdd(false);
@@ -135,7 +153,7 @@ export default function UsersPage() {
     }
   };
 
-  const openEdit = async (u) => {
+  const openEdit = async (u: UserItem) => {
     if (!u) return;
     setError("");
     setSaving(false);
@@ -161,7 +179,7 @@ export default function UsersPage() {
     }
   };
 
-  const submitAdd = async (e) => {
+  const submitAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError("");
@@ -185,7 +203,7 @@ export default function UsersPage() {
     }
   };
 
-  const submitEdit = async (e) => {
+  const submitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editTarget) return;
     setSaving(true);
@@ -205,11 +223,11 @@ export default function UsersPage() {
             ? {
                 ...u,
                 fullName: payload.fullName,
-                phone: payload.phone || null,
+                phone: payload.phone || undefined,
                 roleId: payload.roleId,
                 roleName:
-                  roles.find((r) => Number(r.id) === Number(payload.roleId))
-                    ?.name || u.roleName,
+                  String(roles.find((r) => Number(r.id) === Number(payload.roleId))
+                    ?.name || u.roleName || ""),
                 status: payload.status,
               }
             : u
@@ -227,7 +245,7 @@ export default function UsersPage() {
     }
   };
 
-  const deleteUser = async (userToDelete) => {
+  const deleteUser = async (userToDelete: UserItem) => {
     if (!userToDelete?.id) return;
     if (Number(userToDelete.id) === Number(currentUser?.id)) {
       notify(t("cannot_delete_self", "You cannot delete your own account."), "error");
@@ -531,7 +549,7 @@ export default function UsersPage() {
                 <select
                   value={form.roleId}
                   onChange={(e) =>
-                    setForm((s) => ({ ...s, roleId: e.target.value }))
+                    setForm((s) => ({ ...s, roleId: Number(e.target.value) }))
                   }
                   className={`heritage-input w-full px-4 py-2.5 rounded-lg border ${inputBg} ${inputText} ${border}
                   focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/25 focus:border-[#0c4a6e]/50 transition-all`}
@@ -650,7 +668,7 @@ export default function UsersPage() {
                    <select
                      value={editForm.roleId}
                      onChange={(e) =>
-                       setEditForm((s) => ({ ...s, roleId: e.target.value }))
+                       setEditForm((s) => ({ ...s, roleId: Number(e.target.value) }))
                      }
                      className={`heritage-input w-full px-4 py-2.5 rounded-lg border ${inputBg} ${inputText} ${border}
                      focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/25 focus:border-[#0c4a6e]/50 transition-all`}

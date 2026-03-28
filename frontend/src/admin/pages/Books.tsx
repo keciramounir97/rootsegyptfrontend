@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
   Plus,
@@ -21,6 +21,32 @@ import { formatDate } from "../utils/helpers";
 import { useTranslation } from "../../context/TranslationContext";
 import { useAuth } from "../components/AuthContext";
 import Toast from "../../components/Toast";
+
+interface BookItem {
+  id: string | number;
+  title?: string;
+  author?: string;
+  category?: string;
+  isPublic?: boolean;
+  downloads?: number;
+  uploadedBy?: string;
+  createdAt?: string;
+  fileUrl?: string;
+  coverUrl?: string;
+  [key: string]: unknown;
+}
+
+interface BookForm {
+  title: string;
+  author: string;
+  category: string;
+  description: string;
+  archiveSource: string;
+  documentCode: string;
+  isPublic: boolean;
+  file: File | null;
+  cover: File | null;
+}
 
 export default function Books() {
   const { theme } = useThemeStore();
@@ -52,14 +78,14 @@ export default function Books() {
   ]);
   const allowedImageExts = new Set(["jpg", "jpeg", "png", "gif", "webp"]);
 
-  const getExtension = (name) => {
+  const getExtension = (name: string) => {
     const parts = String(name || "")
       .toLowerCase()
       .split(".");
     return parts.length > 1 ? parts.pop() : "";
   };
 
-  const validateBookFile = (file) => {
+  const validateBookFile = (file: File | null) => {
     if (!file) return t("file_required", "File is required");
     if (file.size > maxBookBytes) {
       return t("file_too_large", "File is too large (max 50MB).");
@@ -74,7 +100,7 @@ export default function Books() {
     return "";
   };
 
-  const validateCoverFile = (file) => {
+  const validateCoverFile = (file: File | null) => {
     if (!file) return t("cover_required", "Cover image is required");
     if (file.size > maxCoverBytes) {
       return t("file_too_large", "File is too large (max 50MB).");
@@ -89,19 +115,21 @@ export default function Books() {
 
   const [tab, setTab] = useState("public"); // public | my (non-admin)
   const [q, setQ] = useState("");
-  const [adminBooks, setAdminBooks] = useState([]);
-  const [myBooks, setMyBooks] = useState([]);
-  const [publicBooks, setPublicBooks] = useState([]);
+  const [adminBooks, setAdminBooks] = useState<BookItem[]>([]);
+  const [myBooks, setMyBooks] = useState<BookItem[]>([]);
+  const [publicBooks, setPublicBooks] = useState<BookItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<BookForm>({
     title: "",
     author: "",
     category: "",
     description: "",
+    archiveSource: "",
+    documentCode: "",
     isPublic: true,
     file: null,
     cover: null,
@@ -109,7 +137,7 @@ export default function Books() {
   const [coverPreview, setCoverPreview] = useState("");
   const [toast, setToast] = useState({ message: "", tone: "success" });
 
-  const notify = useCallback((message, tone = "success") => {
+  const notify = useCallback((message: string, tone = "success") => {
     setToast({ message, tone });
   }, []);
 
@@ -243,7 +271,7 @@ export default function Books() {
           return;
         }
 
-        const shouldFallbackAdminRead = (err) =>
+        const shouldFallbackAdminRead = (err: { response?: { status?: number } }) =>
           shouldFallbackRoute(err) ||
           err?.response?.status === 401 ||
           err?.response?.status === 403 ||
@@ -322,7 +350,7 @@ export default function Books() {
 
   const apiRoot = useMemo(() => getApiRoot(), []);
 
-  const resolveAssetUrl = (value) => {
+  const resolveAssetUrl = (value: unknown) => {
     const raw = String(value || "");
     if (!raw) return "";
     if (raw.startsWith("http")) return raw;
@@ -330,7 +358,7 @@ export default function Books() {
     return `${apiRoot}/${raw}`;
   };
 
-  const coverInitial = (value) =>
+  const coverInitial = (value: unknown) =>
     String(value || "")
       .trim()
       .charAt(0)
@@ -352,13 +380,13 @@ export default function Books() {
     setShowAdd(true);
   };
 
-  const submitAdd = async (e) => {
+  const submitAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError("");
 
     try {
-      const shouldFallbackWrite = (err) =>
+      const shouldFallbackWrite = (err: { response?: { status?: number } }) =>
         shouldFallbackRoute(err) ||
         err?.response?.status === 401 ||
         err?.response?.status === 403 ||
@@ -433,7 +461,7 @@ export default function Books() {
     }
   };
 
-  const openProtected = async (book) => {
+  const openProtected = async (book: BookItem) => {
     if (!book?.id) return;
     setSaving(true);
     setError("");
@@ -456,7 +484,7 @@ export default function Books() {
     }
   };
 
-  const downloadProtected = async (book) => {
+  const downloadProtected = async (book: BookItem) => {
     if (!book?.id) return;
     setSaving(true);
     setError("");
@@ -484,7 +512,7 @@ export default function Books() {
     }
   };
 
-  const openFile = (book) => {
+  const openFile = (book: BookItem) => {
     const fileUrl = book?.fileUrl;
     if (fileUrl) {
       const url = resolveAssetUrl(fileUrl);
@@ -494,9 +522,9 @@ export default function Books() {
     void openProtected(book);
   };
 
-  const downloadUrl = (id) => `${apiRoot}/api/books/${id}/download`;
+  const downloadUrl = (id: string | number) => `${apiRoot}/api/books/${id}/download`;
 
-  const deleteBook = async (book) => {
+  const deleteBook = async (book: BookItem) => {
     const ok = window.confirm(
       t("confirm_delete_book", `Delete "${book?.title || "book"}"?`),
     );
@@ -505,7 +533,7 @@ export default function Books() {
     setSaving(true);
     setError("");
     try {
-      const shouldFallbackWrite = (err) =>
+      const shouldFallbackWrite = (err: { response?: { status?: number } }) =>
         shouldFallbackRoute(err) ||
         err?.response?.status === 401 ||
         err?.response?.status === 403 ||
@@ -529,8 +557,9 @@ export default function Books() {
       }
       void loadBooks();
       notify(t("book_deleted", "Book deleted."));
-    } catch (err) {
-      if (err?.response?.status === 404) {
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { status?: number } };
+      if (apiErr?.response?.status === 404) {
         if (isAdmin) {
           setAdminBooks((prev) => prev.filter((b) => b.id !== book.id));
         } else {

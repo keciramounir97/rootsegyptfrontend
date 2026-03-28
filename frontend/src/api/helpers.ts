@@ -1,15 +1,53 @@
 import { api } from "./client";
 
+interface TreeRaw {
+  id?: string | number;
+  title?: string;
+  description?: string;
+  archive_source?: string;
+  archiveSource?: string;
+  document_code?: string;
+  documentCode?: string;
+  is_public?: boolean;
+  isPublic?: boolean;
+  gedcom_path?: string;
+  gedcomPath?: string;
+  owner?: unknown;
+  owner_name?: unknown;
+  created_at?: string;
+  createdAt?: string;
+  data_format?: string;
+  dataFormat?: string;
+  [key: string]: unknown;
+}
+
+interface OwnerObject {
+  full_name?: string;
+  fullName?: string;
+  email?: string;
+}
+
+interface ApiErrorOverrides {
+  unauthorized?: string;
+  forbidden?: string;
+  notFound?: string;
+  tooLarge?: string;
+  unsupported?: string;
+  invalid?: string;
+  unavailable?: string;
+  network?: string;
+}
+
 /** Normalize tree from API (snake_case → camelCase, add hasGedcom, gedcomUrl, owner) */
-export const normalizeTree = (tree, options?: { apiRoot?: string; isPublic?: boolean }) => {
+export const normalizeTree = (tree: TreeRaw, options?: { apiRoot?: string; isPublic?: boolean }) => {
   if (!tree) return tree;
   const baseUrl = options?.apiRoot ?? "";
   const isPublic = options?.isPublic ?? (tree.is_public ?? tree.isPublic ?? false);
   const ownerRaw = tree.owner ?? tree.owner_name ?? "";
   const owner =
     ownerRaw && typeof ownerRaw === "object"
-      ? ownerRaw.full_name ?? ownerRaw.fullName ?? ownerRaw.email ?? ""
-      : ownerRaw ?? "";
+      ? (ownerRaw as OwnerObject).full_name ?? (ownerRaw as OwnerObject).fullName ?? (ownerRaw as OwnerObject).email ?? ""
+      : (ownerRaw as string) ?? "";
   const hasGedcom = !!(tree.gedcom_path ?? tree.gedcomPath);
   const gedcomPath = hasGedcom
     ? (isPublic ? `/api/trees/${tree.id}/gedcom` : `/api/my/trees/${tree.id}/gedcom`)
@@ -36,12 +74,20 @@ export const getApiRoot = () => {
   return base.replace(/\/api\/?$/, "");
 };
 
-export const shouldFallbackRoute = (error) => {
-  const status = error?.response?.status;
+export const shouldFallbackRoute = (error: unknown) => {
+  const err = error as { response?: { status?: number } };
+  const status = err?.response?.status;
   return status === 404 || status === 405 || status === 501;
 };
 
-export const requestWithFallback = async (requests, shouldFallback = shouldFallbackRoute) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const requestWithFallback = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  requests: Array<() => Promise<any>>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  shouldFallback: (err: any) => boolean = shouldFallbackRoute
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any> => {
   let lastError;
   for (const request of requests) {
     try {
@@ -54,20 +100,28 @@ export const requestWithFallback = async (requests, shouldFallback = shouldFallb
   throw lastError;
 };
 
-export const getApiErrorMessage = (error, fallback = "Operation failed", overrides = {}) => {
-  const status = error?.response?.status;
-  let serverMessage =
-    error?.response?.data?.message || error?.response?.data?.error;
-  if (!serverMessage && typeof error?.response?.data === "string") {
+export const getApiErrorMessage = (
+  error: unknown,
+  fallback = "Operation failed",
+  overrides: ApiErrorOverrides = {}
+) => {
+  const err = error as { response?: { status?: number; data?: { message?: string; error?: string } | string }; code?: string };
+  const status = err?.response?.status;
+  let serverMessage: string | undefined;
+  const data = err?.response?.data;
+  if (data && typeof data === "object" && !Array.isArray(data)) {
+    serverMessage = (data as { message?: string; error?: string }).message || (data as { message?: string; error?: string }).error;
+  }
+  if (!serverMessage && typeof data === "string") {
     try {
-      const parsed = JSON.parse(error.response.data);
+      const parsed = JSON.parse(data) as { message?: string; error?: string };
       serverMessage = parsed?.message || parsed?.error;
     } catch {
       // leave serverMessage falsy
     }
   }
 
-  if (error?.code === "AUTH_MISSING") {
+  if (err?.code === "AUTH_MISSING") {
     return overrides.unauthorized || "Please log in to continue.";
   }
   if (status === 401) {
@@ -107,7 +161,7 @@ export const getApiErrorMessage = (error, fallback = "Operation failed", overrid
       "Service unavailable. Please try again later."
     );
   }
-  if (error?.code === "ERR_NETWORK") {
+  if (err?.code === "ERR_NETWORK") {
     return overrides.network || "Network error. Please try again.";
   }
 

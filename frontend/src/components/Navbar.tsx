@@ -35,7 +35,6 @@ import { useTranslation } from "../context/TranslationContext";
 import { useNotifications } from "../context/NotificationContext";
 import LanguageMenu from "./LanguageMenu";
 import EgyptianLogoMark from "./EgyptianLogoMark";
-import { CONTACT_PHONE_TEL } from "../constants/contact";
 
 type SearchFormData = { query: string };
 
