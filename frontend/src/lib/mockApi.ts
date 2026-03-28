@@ -24,6 +24,10 @@ import {
   MOCK_ROLES,
   MOCK_SEARCH_TREES,
   MOCK_SEARCH_PEOPLE,
+  MOCK_AUDIO,
+  MOCK_CONTACT_SUBMISSIONS,
+  MOCK_RESEARCH_RESOURCES,
+  MOCK_PERIODS,
 } from "./mockData";
 
 // ── State ──────────────────────────────────────────────────────────────
@@ -423,7 +427,139 @@ export async function mockAdapter(
     return makeResponse({ message: "Password changed." }, config);
   }
 
-  // ── CATCH-ALL ─────────────────────────────────────────────────────
+  // ── AUDIO / PODCASTS ──────────────────────────────────────────────────
+  if (method === "get" && /\/admin\/audio/.test(path)) {
+    return makeResponse(MOCK_AUDIO, config);
+  }
+
+  if (method === "get" && /\/audio\/(\d+)$/.test(path)) {
+    const match = path.match(/\/audio\/(\d+)$/);
+    const id = parseInt(match![1], 10);
+    const audio = MOCK_AUDIO.find((a) => a.id === id);
+    if (!audio) throw makeError("Audio not found", 404);
+    return makeResponse(audio, config);
+  }
+
+  if (method === "get" && /\/audio$/.test(path)) {
+    return makeResponse(MOCK_AUDIO, config);
+  }
+
+  if (method === "post" && /\/audio$/.test(path)) {
+    return makeResponse({ message: "Audio uploaded.", id: Date.now() }, config, 201);
+  }
+
+  if (method === "put" && /\/audio\/\d+$/.test(path)) {
+    return makeResponse({ message: "Audio updated." }, config);
+  }
+
+  if (method === "delete" && /\/audio\/\d+$/.test(path)) {
+    return makeResponse({ message: "Audio deleted." }, config);
+  }
+
+  if (method === "post" && /\/audio\/\d+\/play/.test(path)) {
+    return makeResponse({ message: "Play count incremented." }, config);
+  }
+
+  if (method === "post" && /\/audio\/\d+\/like/.test(path)) {
+    return makeResponse({ liked: true, count: Math.floor(Math.random() * 500) + 1 }, config);
+  }
+
+  // ── CONTACT SUBMISSIONS ───────────────────────────────────────────────
+  if (method === "get" && /\/admin\/contact/.test(path)) {
+    return makeResponse(MOCK_CONTACT_SUBMISSIONS, config);
+  }
+
+  if (method === "get" && /\/contact\/(\d+)$/.test(path)) {
+    const match = path.match(/\/contact\/(\d+)$/);
+    const id = parseInt(match![1], 10);
+    const submission = MOCK_CONTACT_SUBMISSIONS.find((c) => c.id === id);
+    if (!submission) throw makeError("Contact submission not found", 404);
+    return makeResponse(submission, config);
+  }
+
+  if (method === "post" && /\/contact$/.test(path)) {
+    let body: any = {};
+    try {
+      body = typeof config.data === "string" ? JSON.parse(config.data) : config.data || {};
+    } catch { /* */ }
+    return makeResponse({ 
+      message: "Thank you for contacting us. We will respond within 24-48 hours.",
+      id: Date.now(),
+      ...body,
+      status: "pending",
+      createdAt: new Date().toISOString()
+    }, config, 201);
+  }
+
+  if (method === "put" && /\/admin\/contact\/\d+/.test(path)) {
+    return makeResponse({ message: "Contact submission updated." }, config);
+  }
+
+  if (method === "delete" && /\/admin\/contact\/\d+/.test(path)) {
+    return makeResponse({ message: "Contact submission deleted." }, config);
+  }
+
+  // ── RESEARCH RESOURCES ────────────────────────────────────────────────
+  if (method === "get" && /\/admin\/resources/.test(path)) {
+    return makeResponse(MOCK_RESEARCH_RESOURCES, config);
+  }
+
+  if (method === "get" && /\/resources\/(\d+)$/.test(path)) {
+    const match = path.match(/\/resources\/(\d+)$/);
+    const id = parseInt(match![1], 10);
+    const resource = MOCK_RESEARCH_RESOURCES.find((r) => r.id === id);
+    if (!resource) throw makeError("Resource not found", 404);
+    return makeResponse(resource, config);
+  }
+
+  if (method === "get" && /\/resources$/.test(path)) {
+    const q = String(new URL(`http://x${url}`).searchParams.get("category") || "").toLowerCase().trim();
+    const filtered = q ? MOCK_RESEARCH_RESOURCES.filter(r => r.category.toLowerCase().includes(q)) : MOCK_RESEARCH_RESOURCES;
+    return makeResponse(filtered, config);
+  }
+
+  if (method === "post" && /\/admin\/resources$/.test(path)) {
+    return makeResponse({ message: "Resource added.", id: Date.now() }, config, 201);
+  }
+
+  if (method === "put" && /\/admin\/resources\/\d+$/.test(path)) {
+    return makeResponse({ message: "Resource updated." }, config);
+  }
+
+  if (method === "delete" && /\/admin\/resources\/\d+$/.test(path)) {
+    return makeResponse({ message: "Resource deleted." }, config);
+  }
+
+  // ── HISTORICAL PERIODS ────────────────────────────────────────────────
+  if (method === "get" && /\/admin\/periods/.test(path)) {
+    return makeResponse(MOCK_PERIODS, config);
+  }
+
+  if (method === "get" && /\/periods\/(\d+)$/.test(path)) {
+    const match = path.match(/\/periods\/(\d+)$/);
+    const id = parseInt(match![1], 10);
+    const period = MOCK_PERIODS.find((p) => p.id === id);
+    if (!period) throw makeError("Period not found", 404);
+    return makeResponse(period, config);
+  }
+
+  if (method === "get" && /\/periods$/.test(path)) {
+    return makeResponse(MOCK_PERIODS, config);
+  }
+
+  if (method === "post" && /\/admin\/periods$/.test(path)) {
+    return makeResponse({ message: "Period added.", id: Date.now() }, config, 201);
+  }
+
+  if (method === "put" && /\/admin\/periods\/\d+$/.test(path)) {
+    return makeResponse({ message: "Period updated." }, config);
+  }
+
+  if (method === "delete" && /\/admin\/periods\/\d+$/.test(path)) {
+    return makeResponse({ message: "Period deleted." }, config);
+  }
+
+  // ── CATCH-ALL ─────────────────────────────────────────────────────────
   // For any unknown endpoint, return empty success
   console.warn(`[MockAPI] Unhandled ${method.toUpperCase()} ${path} — returning empty 200`);
   return makeResponse({}, config);
